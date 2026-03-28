@@ -1393,48 +1393,37 @@ void loop() {
             <div style="margin-bottom:10px;font-size:13px;color:var(--text-dim);">Install the <span class="lib-tag">DHT sensor library</span> by Adafruit from Library Manager. You should see temperature and humidity on Chip's screen.</div>
             <div class="code-block">
               <div class="code-header"><span class="code-lang">ARDUINO C++ — DHT TEST WITH OLED</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
-              <pre>#include &lt;Wire.h&gt;
-#include &lt;Adafruit_GFX.h&gt;
-#include &lt;Adafruit_SSD1306.h&gt;
-#include &lt;DHT.h&gt;
+              <pre> #include <DHT.h>
 
-#define W 128
-#define H 64
-Adafruit_SSD1306 display(W, H, &Wire, -1);
+#define DHTPIN 4       // DATA pin connected to D4
+#define DHTTYPE DHT11  // DHT11 sensor
 
-#define DHTPIN 4
-#define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
-unsigned long lastRead = 0;
-float temp = 0, hum = 0;
-
 void setup() {
-  Wire.begin();
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  Serial.begin(9600);
   dht.begin();
 }
 
 void loop() {
-  // Read only every 1.2s — DHT11 is slow
-  if(millis() - lastRead > 1200) {
-    hum  = dht.readHumidity();
-    temp = dht.readTemperature();
-    lastRead = millis();
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  // Check if reading failed
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
   }
 
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.print(" °C  |  Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
 
-  display.setCursor(0, 0);  display.print("TEMP");
-  display.setCursor(0, 20); display.print(temp); display.print(" C");
-
-  display.setCursor(0, 40); display.print("HUM");
-  display.setCursor(60,40); display.print(hum);  display.print(" %");
-
-  display.display();
-}</pre>
+  delay(2000); // Wait 2 seconds
+}
+</pre>
             </div>
           </div>
         </div>
